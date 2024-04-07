@@ -153,26 +153,29 @@ setTimeout(() => {
     }
 
     setInterval(() => {
-
         var currentMessage = getLastChatMessage();
         if (currentMessage == null) {
             return;
         }
 
+        debugLog("currently last received message: ", currentMessage)
+
+        const hasLastMessageChanged = currentMessage !== lastMessage;
+        if (hasLastMessageChanged) {
+            debugLog("notification event occured")
+            play_sound();
+            lastMessage = currentMessage;
+        }
+    }, 500);
+
+    setInterval(() => {
         var currentPerson = getLastPersonEnteredMessage()
         if (currentPerson == null) {
             return;
         }
 
-        // debugLog("currently last received message: ", currentMessage)
         debugLog("currently last person entered: ", currentPerson)
 
-        const hasLastMessageChanged = currentMessage !== lastMessage;
-        if (hasLastMessageChanged) {
-            // debugLog("notification event occured")
-            play_sound();
-            lastMessage = currentMessage;
-        }
 
         const hasLastPersonChanged = currentPerson !== lastPersonEntered;
         if (hasLastPersonChanged) {
@@ -180,8 +183,7 @@ setTimeout(() => {
             play_person_entered()
             lastPersonEntered = currentPerson
         }
-
-    }, 500);
+    }, 500)
 }, 1000)
 
 setTimeout(() => {
