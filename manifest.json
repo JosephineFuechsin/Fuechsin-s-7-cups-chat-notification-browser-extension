@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Fuechsin's 7 cups chat notifications",
-    "version": "1.1",
+    "version": "1.2",
 
     "description": "Adds a button to enable a notification sound in the current tab of a 7 cups chat.",
     "homepage_url": "https://github.com/JosephineFuechsin/Fuechsin-s-7-cups-chat-notification-browser-extension",
@@ -20,6 +20,7 @@
 
     "web_accessible_resources": [
         "sound/powerUp7.mp3",
+        "sound/pepSound1.mp3",
         "img/musicOff.png",
         "img/musicOn.png"
     ]

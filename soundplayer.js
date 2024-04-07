@@ -8,8 +8,18 @@ var sound;
 if(isFirefox) {
    sound = browser.runtime.getURL("sound/powerUp7.mp3")
 } else if(isChrome || isOpera) {
-    sound = chrome.runtime.getURL("sound/powerUp7.mp3")
+   sound = chrome.runtime.getURL("sound/powerUp7.mp3")
 }
+
+var person_entered_sound;
+if(isFirefox) {
+    person_entered_sound = browser.runtime.getURL("sound/pepSound1.mp3")
+} else if(isChrome || isOpera) {
+    person_entered_sound = chrome.runtime.getURL("sound/pepSound1.mp3")
+}
+
+const newMessageAudio = new Audio(sound);
+const newPersonEnteredAudio = new Audio(person_entered_sound);
 
 var $ = window.jQuery;
 var isMuted = true
@@ -24,9 +34,11 @@ function log(...args) {
     console.log(TAG, ...args)
 }
 
+// ##############################           last chat message            #############################################
+
 function play_sound() {
     if (!isMuted) {
-        new Audio(sound).play()
+        newMessageAudio.play()
     }
 }
 
@@ -50,6 +62,40 @@ function getLastChatMessage() {
 
     return lastMessage
 }
+
+// ##############################           person entered            #############################################
+
+function play_person_entered() {
+    if(!isMuted) {
+        debugLog("will play person entered sound")
+        new Audio(person_entered_sound).play()
+        debugLog("finished playing person entered sound")
+    }
+}
+
+function getLastPersonEnteredMessage() {
+    const chatbox = document.querySelector("div[data-id='container-messages']")
+    if(chatbox == null) {
+        debugLog("couldn't find chatbox element")
+        return
+    }
+
+    const allPersonEntered = [...chatbox.querySelectorAll("div > i.fa.fa-user")]
+    if(allPersonEntered == null || allPersonEntered.length == 0) {
+        debugLog("couldn't find a person entered message")
+        return
+    }
+
+    const lastPersonEnteredMessage = allPersonEntered.pop().parentElement
+    if(lastPersonEnteredMessage == null) {
+        debugLog("couldn't find person entered message elements")
+        return
+    }
+
+    return lastPersonEnteredMessage
+}
+
+// ##############################           user interface            #############################################
 
 function insertMuteButton() {
     var muteImage
@@ -93,7 +139,12 @@ function insertMuteButton() {
 // ##############################           MAIN            #############################################
 
 setTimeout(() => {
+    var lastPersonEntered = null
     var lastMessage = null
+    var personEntered = getLastPersonEnteredMessage()
+    if (personEntered != undefined) {
+        lastPersonEntered = personEntered
+    }
     var message = getLastChatMessage()
     if (message != undefined) {
         lastMessage = message
@@ -108,13 +159,26 @@ setTimeout(() => {
             return;
         }
 
-        debugLog("currently last received message: ", currentMessage)
+        var currentPerson = getLastPersonEnteredMessage()
+        if (currentPerson == null) {
+            return;
+        }
+
+        // debugLog("currently last received message: ", currentMessage)
+        debugLog("currently last person entered: ", currentPerson)
 
         const hasLastMessageChanged = currentMessage !== lastMessage;
         if (hasLastMessageChanged) {
-            debugLog("notification event occured")
+            // debugLog("notification event occured")
             play_sound();
             lastMessage = currentMessage;
+        }
+
+        const hasLastPersonChanged = currentPerson !== lastPersonEntered;
+        if (hasLastPersonChanged) {
+            debugLog("person event occurred")
+            play_person_entered()
+            lastPersonEntered = currentPerson
         }
 
     }, 500);
